@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
+	"os"
+	"strings"
 	"time"
 )
 
@@ -16,7 +17,7 @@ type Note struct {
 
 func New(title, content string) (*Note, error) {
 	if title == "" || content == "" {
-		return nil, errors.New("Invalid Input: Title and Content must not be empty.")
+		return nil, errors.New("invalid input: Title and Content must not be empty")
 	}
 
 	return &Note{
@@ -26,15 +27,15 @@ func New(title, content string) (*Note, error) {
 	}, nil
 }
 
-func (n *Note) Encoder(w io.Writer) error {
-	encoder := json.NewEncoder(w)
-	err := encoder.Encode(n)
+func (n *Note) Save() error {
 
+	fileName := strings.ReplaceAll(n.Title, " ", "_")
+	fileName = strings.ToLower(fileName) + ".json"
+	fileContent, err := json.Marshal(n)
 	if err != nil {
 		return err
 	}
-
-	return nil
+	return os.WriteFile(fileName, []byte(fileContent), 0644)
 }
 
 func (n *Note) Display() {
