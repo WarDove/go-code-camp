@@ -35,9 +35,23 @@ func main() {
 	title, content := getNodeData()
 
 	userNote, err := note.New(title, content)
+
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	userNote.Display()
+	userNoteJson, err := os.OpenFile("userNote.json", os.O_CREATE|os.O_WRONLY, 0644)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	defer userNoteJson.Close()
+
+	err = userNote.Encoder(userNoteJson)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
