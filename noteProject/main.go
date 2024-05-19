@@ -4,10 +4,21 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/wardove/noteProject/note"
+	"github.com/wardove/noteProject/todo"
 	"log"
 	"os"
 	"strings"
 )
+
+// if an interface has a single method, it is named by the method name plus the "er" suffix
+type saver interface {
+	Save() error
+}
+
+type outputable interface {
+	saver
+	Display()
+}
 
 func getUserInput(prompt string) string {
 
@@ -24,24 +35,41 @@ func getUserInput(prompt string) string {
 	return text
 }
 
-func getNodeData() (string, string) {
+func getNoteData() (string, string) {
 	title := getUserInput("Note title: ")
 	content := getUserInput("Note content: ")
 	return title, content
 }
 
+func saveData(data saver) error {
+	return data.Save()
+}
+
+func outputData(data outputable) {
+	data.Display()
+}
+
 func main() {
 
-	title, content := getNodeData()
-
+	title, content := getNoteData()
+	todoText := getUserInput("Todo text: ")
+	userTodo := todo.New(todoText)
 	userNote, err := note.New(title, content)
 
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	userNote.Display()
-	err = userNote.Save()
+	outputData(userNote)
+	outputData(userTodo)
+
+	err = saveData(userNote)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = saveData(userTodo)
 
 	if err != nil {
 		log.Fatalln(err)
