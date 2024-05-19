@@ -75,3 +75,7 @@ func main() {
 		log.Fatalln(err)
 	}
 }
+
+func test(any) {
+
+}
